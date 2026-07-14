@@ -975,7 +975,7 @@ namespace AssetCollector
             AssetPayload payload = currentPayload;
             string serverUrl = serverUrlBox.Text.Trim();
 
-            ToggleBusy(true, "正在提交到服务端...");
+            ToggleBusyKeepPreview(true, "正在提交到服务端...");
             ThreadPool.QueueUserWorkItem(delegate
             {
                 string result = null;
@@ -1016,7 +1016,7 @@ namespace AssetCollector
                     }
                     finally
                     {
-                        ToggleBusy(false, null);
+                        ToggleBusyKeepPreview(false, null);
                     }
                 });
             });
@@ -1441,6 +1441,18 @@ namespace AssetCollector
                 previewBox.Text = text;
                 SetStatus(text);
             }
+            Cursor = busy ? Cursors.WaitCursor : Cursors.Default;
+        }
+
+        private void ToggleBusyKeepPreview(bool busy, string text)
+        {
+            if (collectButton != null) collectButton.Enabled = !busy;
+            if (saveOfflineButton != null) saveOfflineButton.Enabled = !busy && currentPayload != null;
+            if (exportExcelButton != null) exportExcelButton.Enabled = !busy;
+            if (updateButton != null) updateButton.Enabled = !busy;
+            if (submitButton != null) submitButton.Enabled = !busy && currentPayload != null;
+            if (submitOfflineButton != null) submitOfflineButton.Enabled = !busy && OfflineStore.Count() > 0;
+            if (!string.IsNullOrEmpty(text)) SetStatus(text);
             Cursor = busy ? Cursors.WaitCursor : Cursors.Default;
         }
 
