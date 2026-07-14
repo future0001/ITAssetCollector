@@ -52,6 +52,14 @@ namespace AssetCollector
         private Dictionary<int, string> automaticDiskSerials = new Dictionary<int, string>();
         private static readonly string[] DepartmentOptions = new string[0];
         private static readonly string[] LocationOptions = new string[0];
+        private static readonly Color AppBackColor = Color.FromArgb(238, 246, 252);
+        private static readonly Color PanelBackColor = Color.FromArgb(255, 255, 255);
+        private static readonly Color PanelBorderColor = Color.FromArgb(199, 216, 230);
+        private static readonly Color TextColor = Color.FromArgb(16, 32, 51);
+        private static readonly Color MutedTextColor = Color.FromArgb(70, 87, 107);
+        private static readonly Color AccentBackColor = Color.FromArgb(222, 241, 252);
+        private static readonly Color AccentBorderColor = Color.FromArgb(105, 173, 216);
+        private static readonly Color AccentTextColor = Color.FromArgb(15, 53, 84);
 
         public MainForm()
         {
@@ -62,6 +70,7 @@ namespace AssetCollector
             MinimumSize = new Size(900, 720);
             StartPosition = FormStartPosition.CenterScreen;
             Font = new Font("Microsoft YaHei UI", 9F);
+            BackColor = AppBackColor;
 
             storageSettings = ClientStorageSettings.Load();
             OfflineStore.Configure(storageSettings.OfflineStorePath());
@@ -320,8 +329,8 @@ namespace AssetCollector
             root.Dock = DockStyle.Fill;
             root.ColumnCount = 1;
             root.RowCount = 7;
-            root.Padding = new Padding(12);
-            root.BackColor = Color.FromArgb(245, 247, 250);
+            root.Padding = new Padding(14);
+            root.BackColor = AppBackColor;
             root.RowStyles.Add(new RowStyle(SizeType.AutoSize));
             root.RowStyles.Add(new RowStyle(SizeType.AutoSize));
             root.RowStyles.Add(new RowStyle(SizeType.AutoSize));
@@ -354,7 +363,8 @@ namespace AssetCollector
             label.Dock = DockStyle.Fill;
             label.AutoEllipsis = true;
             label.TextAlign = ContentAlignment.MiddleLeft;
-            label.ForeColor = Color.FromArgb(36, 67, 96);
+            label.ForeColor = AccentTextColor;
+            label.Font = new Font(Font, FontStyle.Bold);
             label.Text = "建议流程：自动检测服务端 -> 一键获取信息 -> 提交到服务器。关闭窗口后客户端仍会在后台托盘运行。";
             panel.Controls.Add(label);
 
@@ -368,6 +378,7 @@ namespace AssetCollector
             group.Dock = DockStyle.Top;
             group.Padding = new Padding(12, 10, 12, 12);
             group.Height = 76;
+            StyleGroupBox(group);
 
             var panel = new TableLayoutPanel();
             panel.Dock = DockStyle.Fill;
@@ -377,8 +388,9 @@ namespace AssetCollector
             panel.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 110));
             group.Controls.Add(panel);
 
-            panel.Controls.Add(new Label { Text = "地址", AutoSize = true, Anchor = AnchorStyles.Left }, 0, 0);
+            panel.Controls.Add(CreateFieldLabel("地址"), 0, 0);
             serverUrlBox = new TextBox { Dock = DockStyle.Fill, Text = ApiClient.DefaultServerUrl() };
+            StyleTextBox(serverUrlBox);
             panel.Controls.Add(serverUrlBox, 1, 0);
             detectServerButton = CreateButton("自动检测", 96, true, DetectServerButton_Click);
             panel.Controls.Add(detectServerButton, 2, 0);
@@ -393,6 +405,7 @@ namespace AssetCollector
             group.Dock = DockStyle.Top;
             group.Padding = new Padding(12, 10, 12, 12);
             group.Height = 160;
+            StyleGroupBox(group);
 
             var panel = new TableLayoutPanel();
             panel.Dock = DockStyle.Fill;
@@ -426,6 +439,7 @@ namespace AssetCollector
             group.Dock = DockStyle.Top;
             group.Padding = new Padding(12, 10, 12, 12);
             group.Height = 116;
+            StyleGroupBox(group);
 
             var panel = new TableLayoutPanel();
             panel.Dock = DockStyle.Fill;
@@ -438,25 +452,29 @@ namespace AssetCollector
             panel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50));
             group.Controls.Add(panel);
 
-            panel.Controls.Add(new Label { Text = "离线保存目录", AutoSize = true, Anchor = AnchorStyles.Left, Margin = new Padding(0, 7, 8, 7) }, 0, 0);
+            panel.Controls.Add(CreateFieldLabel("离线保存目录"), 0, 0);
             offlineDirectoryBox = new TextBox { Dock = DockStyle.Fill, Margin = new Padding(0, 4, 8, 4), Text = storageSettings.offlineDirectory };
+            StyleTextBox(offlineDirectoryBox);
             offlineDirectoryBox.Leave += delegate { SaveStorageSettingsFromUi(); };
             panel.Controls.Add(offlineDirectoryBox, 1, 0);
             panel.Controls.Add(CreateButton("选择目录", 84, true, delegate { BrowseDirectory(offlineDirectoryBox); }), 2, 0);
 
-            panel.Controls.Add(new Label { Text = "离线文件名", AutoSize = true, Anchor = AnchorStyles.Left, Margin = new Padding(0, 7, 8, 7) }, 3, 0);
+            panel.Controls.Add(CreateFieldLabel("离线文件名"), 3, 0);
             offlineFileNameBox = new TextBox { Dock = DockStyle.Fill, Margin = new Padding(0, 4, 8, 4), Text = storageSettings.offlineFileName };
+            StyleTextBox(offlineFileNameBox);
             offlineFileNameBox.Leave += delegate { SaveStorageSettingsFromUi(); };
             panel.Controls.Add(offlineFileNameBox, 4, 0);
 
-            panel.Controls.Add(new Label { Text = "Excel目录", AutoSize = true, Anchor = AnchorStyles.Left, Margin = new Padding(0, 7, 8, 7) }, 0, 1);
+            panel.Controls.Add(CreateFieldLabel("Excel目录"), 0, 1);
             excelDirectoryBox = new TextBox { Dock = DockStyle.Fill, Margin = new Padding(0, 4, 8, 4), Text = storageSettings.excelDirectory };
+            StyleTextBox(excelDirectoryBox);
             excelDirectoryBox.Leave += delegate { SaveStorageSettingsFromUi(); };
             panel.Controls.Add(excelDirectoryBox, 1, 1);
             panel.Controls.Add(CreateButton("选择目录", 84, true, delegate { BrowseDirectory(excelDirectoryBox); }), 2, 1);
 
-            panel.Controls.Add(new Label { Text = "Excel文件名", AutoSize = true, Anchor = AnchorStyles.Left, Margin = new Padding(0, 7, 8, 7) }, 3, 1);
+            panel.Controls.Add(CreateFieldLabel("Excel文件名"), 3, 1);
             excelFileNameBox = new TextBox { Dock = DockStyle.Fill, Margin = new Padding(0, 4, 8, 4), Text = storageSettings.excelFileNameTemplate };
+            StyleTextBox(excelFileNameBox);
             excelFileNameBox.Leave += delegate { SaveStorageSettingsFromUi(); };
             panel.Controls.Add(excelFileNameBox, 4, 1);
 
@@ -475,6 +493,7 @@ namespace AssetCollector
             group.Text = "采集预览";
             group.Dock = DockStyle.Fill;
             group.Padding = new Padding(12, 10, 12, 12);
+            StyleGroupBox(group);
 
             previewBox = new TextBox();
             previewBox.Dock = DockStyle.Fill;
@@ -482,7 +501,9 @@ namespace AssetCollector
             previewBox.ScrollBars = ScrollBars.Both;
             previewBox.ReadOnly = true;
             previewBox.WordWrap = false;
-            previewBox.BackColor = Color.White;
+            previewBox.BackColor = Color.FromArgb(251, 253, 255);
+            previewBox.ForeColor = TextColor;
+            previewBox.BorderStyle = BorderStyle.FixedSingle;
             previewBox.Font = new Font("Consolas", 10F);
             group.Controls.Add(previewBox);
 
@@ -523,10 +544,61 @@ namespace AssetCollector
         private void StylePrimaryButton(Button button)
         {
             if (button == null) return;
-            button.BackColor = Color.FromArgb(222, 241, 252);
-            button.ForeColor = Color.FromArgb(16, 53, 84);
-            button.FlatStyle = FlatStyle.Standard;
+            button.BackColor = AccentBackColor;
+            button.ForeColor = AccentTextColor;
+            button.FlatStyle = FlatStyle.Flat;
+            button.FlatAppearance.BorderColor = AccentBorderColor;
+            button.FlatAppearance.MouseOverBackColor = Color.FromArgb(209, 234, 250);
+            button.FlatAppearance.MouseDownBackColor = Color.FromArgb(190, 222, 244);
             button.UseVisualStyleBackColor = false;
+        }
+
+        private void StyleSecondaryButton(Button button)
+        {
+            if (button == null) return;
+            button.BackColor = Color.White;
+            button.ForeColor = TextColor;
+            button.FlatStyle = FlatStyle.Flat;
+            button.FlatAppearance.BorderColor = PanelBorderColor;
+            button.FlatAppearance.MouseOverBackColor = Color.FromArgb(245, 250, 255);
+            button.FlatAppearance.MouseDownBackColor = Color.FromArgb(232, 244, 255);
+            button.UseVisualStyleBackColor = false;
+        }
+
+        private void StyleGroupBox(GroupBox group)
+        {
+            group.BackColor = PanelBackColor;
+            group.ForeColor = TextColor;
+            group.Font = Font;
+        }
+
+        private Label CreateFieldLabel(string text)
+        {
+            return new Label
+            {
+                Text = text,
+                AutoSize = true,
+                Anchor = AnchorStyles.Left,
+                Margin = new Padding(0, 7, 8, 7),
+                ForeColor = TextColor,
+                Font = new Font(Font, FontStyle.Regular)
+            };
+        }
+
+        private void StyleTextBox(TextBox box)
+        {
+            if (box == null) return;
+            box.BorderStyle = BorderStyle.FixedSingle;
+            box.BackColor = Color.White;
+            box.ForeColor = TextColor;
+        }
+
+        private void StyleComboBox(ComboBox box)
+        {
+            if (box == null) return;
+            box.BackColor = Color.White;
+            box.ForeColor = TextColor;
+            box.FlatStyle = FlatStyle.Standard;
         }
 
         private void AddButtonTips()
@@ -582,7 +654,7 @@ namespace AssetCollector
 
             offlineCountLabel = new Label { AutoSize = true, Anchor = AnchorStyles.Left };
             statusLabel = new Label { AutoSize = true, Anchor = AnchorStyles.Right };
-            offlineCountLabel.ForeColor = Color.FromArgb(71, 84, 103);
+            offlineCountLabel.ForeColor = MutedTextColor;
             statusLabel.ForeColor = Color.FromArgb(20, 122, 99);
             panel.Controls.Add(offlineCountLabel, 0, 0);
             panel.Controls.Add(statusLabel, 1, 0);
@@ -593,6 +665,7 @@ namespace AssetCollector
         private Button CreateButton(string text, int width, bool enabled, EventHandler handler)
         {
             var button = new Button { Text = text, Width = width, Height = 34, Enabled = enabled, Margin = new Padding(6, 0, 0, 0) };
+            StyleSecondaryButton(button);
             button.Click += handler;
             return button;
         }
@@ -636,8 +709,9 @@ namespace AssetCollector
             int labelCol = (index % 2) * 2;
             int inputCol = labelCol + 1;
 
-            panel.Controls.Add(new Label { Text = label, AutoSize = true, Anchor = AnchorStyles.Left, Margin = new Padding(0, 7, 8, 7) }, labelCol, row);
+            panel.Controls.Add(CreateFieldLabel(label), labelCol, row);
             var box = new TextBox { Dock = DockStyle.Fill, Margin = new Padding(0, 4, 16, 4) };
+            StyleTextBox(box);
             panel.Controls.Add(box, inputCol, row);
             return box;
         }
@@ -648,8 +722,9 @@ namespace AssetCollector
             int labelCol = (index % 2) * 2;
             int inputCol = labelCol + 1;
 
-            panel.Controls.Add(new Label { Text = label, AutoSize = true, Anchor = AnchorStyles.Left, Margin = new Padding(0, 7, 8, 7) }, labelCol, row);
+            panel.Controls.Add(CreateFieldLabel(label), labelCol, row);
             var box = new ComboBox { Dock = DockStyle.Fill, Margin = new Padding(0, 4, 16, 4), DropDownStyle = ComboBoxStyle.DropDown };
+            StyleComboBox(box);
             box.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
             box.AutoCompleteSource = AutoCompleteSource.ListItems;
             box.Items.AddRange(items);

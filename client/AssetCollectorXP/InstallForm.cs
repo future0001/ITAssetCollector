@@ -18,6 +18,13 @@ namespace AssetCollector
         private ToolTip uiToolTip;
         private Dictionary<string, string> organizationEmployeeDepartments = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         private bool organizationLoadInProgress;
+        private static readonly Color AppBackColor = Color.FromArgb(238, 246, 252);
+        private static readonly Color TextColor = Color.FromArgb(16, 32, 51);
+        private static readonly Color MutedTextColor = Color.FromArgb(70, 87, 107);
+        private static readonly Color PanelBorderColor = Color.FromArgb(199, 216, 230);
+        private static readonly Color AccentBackColor = Color.FromArgb(222, 241, 252);
+        private static readonly Color AccentBorderColor = Color.FromArgb(105, 173, 216);
+        private static readonly Color AccentTextColor = Color.FromArgb(15, 53, 84);
 
         public InstallForm()
         {
@@ -28,6 +35,7 @@ namespace AssetCollector
             MinimumSize = new Size(480, 320);
             StartPosition = FormStartPosition.CenterScreen;
             Font = new Font("Microsoft YaHei UI", 9F);
+            BackColor = AppBackColor;
             FormBorderStyle = FormBorderStyle.FixedDialog;
             MaximizeBox = false;
 
@@ -58,7 +66,7 @@ namespace AssetCollector
             root.ColumnCount = 1;
             root.RowCount = 4;
             root.Padding = new Padding(18);
-            root.BackColor = Color.FromArgb(245, 247, 250);
+            root.BackColor = AppBackColor;
             root.RowStyles.Add(new RowStyle(SizeType.AutoSize));
             root.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
             root.RowStyles.Add(new RowStyle(SizeType.AutoSize));
@@ -68,6 +76,7 @@ namespace AssetCollector
             var title = new Label();
             title.Text = "\u5b89\u88c5\u524d\u8bf7\u586b\u5199\u4f7f\u7528\u4eba\u4fe1\u606f";
             title.Font = new Font(Font.FontFamily, 12F, FontStyle.Bold);
+            title.ForeColor = TextColor;
             title.AutoSize = true;
             title.Margin = new Padding(0, 0, 0, 14);
             root.Controls.Add(title, 0, 0);
@@ -78,6 +87,7 @@ namespace AssetCollector
             statusLabel = new Label();
             statusLabel.AutoSize = true;
             statusLabel.Margin = new Padding(0, 12, 0, 0);
+            statusLabel.ForeColor = MutedTextColor;
             statusLabel.Text = "\u6b63\u5728\u81ea\u52a8\u63a2\u6d4b\u670d\u52a1\u5668...";
             root.Controls.Add(statusLabel, 0, 3);
         }
@@ -94,18 +104,22 @@ namespace AssetCollector
 
             panel.Controls.Add(Label("\u670d\u52a1\u5668\u5730\u5740"), 0, 0);
             serverUrlBox = new TextBox { Dock = DockStyle.Fill, Margin = new Padding(0, 4, 8, 4), Text = ApiClient.DefaultServerUrl() };
+            StyleTextBox(serverUrlBox);
             panel.Controls.Add(serverUrlBox, 1, 0);
             detectButton = new Button { Text = "\u91cd\u65b0\u63a2\u6d4b", Dock = DockStyle.Fill, Height = 30, Margin = new Padding(0, 3, 0, 3) };
+            StyleSecondaryButton(detectButton);
             detectButton.Click += delegate { BeginDiscoverServer(true); };
             panel.Controls.Add(detectButton, 2, 0);
 
             panel.Controls.Add(Label("\u5458\u5de5\u59d3\u540d *"), 0, 1);
             nameBox = new TextBox { Dock = DockStyle.Fill, Margin = new Padding(0, 4, 8, 4) };
+            StyleTextBox(nameBox);
             panel.Controls.Add(nameBox, 1, 1);
             panel.SetColumnSpan(nameBox, 2);
 
             panel.Controls.Add(Label("\u90e8\u95e8 *"), 0, 2);
             departmentBox = new ComboBox { Dock = DockStyle.Fill, Margin = new Padding(0, 4, 8, 4), DropDownStyle = ComboBoxStyle.DropDown };
+            StyleComboBox(departmentBox);
             departmentBox.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
             departmentBox.AutoCompleteSource = AutoCompleteSource.ListItems;
             panel.Controls.Add(departmentBox, 1, 2);
@@ -124,7 +138,7 @@ namespace AssetCollector
 
         private Label Label(string text)
         {
-            return new Label { Text = text, AutoSize = true, Anchor = AnchorStyles.Left, Margin = new Padding(0, 9, 8, 7) };
+            return new Label { Text = text, AutoSize = true, Anchor = AnchorStyles.Left, Margin = new Padding(0, 9, 8, 7), ForeColor = TextColor };
         }
 
         private Control BuildButtons()
@@ -136,13 +150,12 @@ namespace AssetCollector
             panel.Margin = new Padding(0, 14, 0, 0);
 
             installButton = new Button { Text = "\u5b89\u88c5", Width = 92, Height = 34, Margin = new Padding(8, 0, 0, 0) };
-            installButton.BackColor = Color.FromArgb(222, 241, 252);
-            installButton.ForeColor = Color.FromArgb(16, 53, 84);
-            installButton.UseVisualStyleBackColor = false;
+            StylePrimaryButton(installButton);
             installButton.Click += InstallButton_Click;
             panel.Controls.Add(installButton);
 
             cancelButton = new Button { Text = "\u53d6\u6d88", Width = 92, Height = 34, Margin = new Padding(8, 0, 0, 0) };
+            StyleSecondaryButton(cancelButton);
             cancelButton.Click += delegate { Close(); };
             panel.Controls.Add(cancelButton);
 
@@ -157,6 +170,46 @@ namespace AssetCollector
             uiToolTip.SetToolTip(nameBox, "填写后会尝试按组织架构自动匹配部门。");
             uiToolTip.SetToolTip(departmentBox, "可从组织架构下拉选择，也可手动输入。");
             uiToolTip.SetToolTip(installButton, "安装后后台服务和托盘会自动启动，桌面快捷方式可重新打开客户端。");
+        }
+
+        private void StylePrimaryButton(Button button)
+        {
+            if (button == null) return;
+            button.BackColor = AccentBackColor;
+            button.ForeColor = AccentTextColor;
+            button.FlatStyle = FlatStyle.Flat;
+            button.FlatAppearance.BorderColor = AccentBorderColor;
+            button.FlatAppearance.MouseOverBackColor = Color.FromArgb(209, 234, 250);
+            button.FlatAppearance.MouseDownBackColor = Color.FromArgb(190, 222, 244);
+            button.UseVisualStyleBackColor = false;
+        }
+
+        private void StyleSecondaryButton(Button button)
+        {
+            if (button == null) return;
+            button.BackColor = Color.White;
+            button.ForeColor = TextColor;
+            button.FlatStyle = FlatStyle.Flat;
+            button.FlatAppearance.BorderColor = PanelBorderColor;
+            button.FlatAppearance.MouseOverBackColor = Color.FromArgb(245, 250, 255);
+            button.FlatAppearance.MouseDownBackColor = Color.FromArgb(232, 244, 255);
+            button.UseVisualStyleBackColor = false;
+        }
+
+        private void StyleTextBox(TextBox box)
+        {
+            if (box == null) return;
+            box.BorderStyle = BorderStyle.FixedSingle;
+            box.BackColor = Color.White;
+            box.ForeColor = TextColor;
+        }
+
+        private void StyleComboBox(ComboBox box)
+        {
+            if (box == null) return;
+            box.BackColor = Color.White;
+            box.ForeColor = TextColor;
+            box.FlatStyle = FlatStyle.Standard;
         }
 
         private void BeginDiscoverServer(bool showResult)
