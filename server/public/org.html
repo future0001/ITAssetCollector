@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Organization Chart</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body class="detailPage" data-page="org">
+  <header class="detailTopbar">
+    <div class="brandBlock">
+      <div class="brandMark">ORG</div>
+      <div class="brandText">
+        <h1 data-i18n="orgChartTitle">Organization Chart</h1>
+        <p id="detailSummary">Loading...</p>
+      </div>
+    </div>
+    <div class="detailActions">
+      <select id="languageSelect" title="Language">
+        <option value="zh-CN">&#x7B80;&#x4F53;&#x4E2D;&#x6587;</option>
+        <option value="en-US">English</option>
+      </select>
+      <select id="orgCompanySelect" class="orgCompanySelect" data-i18n-title="orgCompanySelectTitle" hidden></select>
+      <button id="manageOrgBtn" class="primary" type="button" data-i18n="manageOrg">Organization</button>
+      <button id="refreshBtn" type="button" data-i18n="refresh">Refresh</button>
+      <a class="button" href="/" data-i18n="backToAssets">Back</a>
+    </div>
+  </header>
+
+  <main class="detailLayout">
+    <section class="orgDashboard detailPanel" aria-label="Organization chart">
+      <div class="orgChartHeader">
+        <div>
+          <h2 data-i18n="orgChartViewTitle">Organization Overview</h2>
+          <p data-i18n="orgChartViewHint">Click a node to edit it. Use the controls to navigate large structures.</p>
+        </div>
+        <div class="orgChartTools">
+          <button id="orgCenterChartBtn" type="button" data-i18n="orgCenterChart">Center</button>
+          <button id="orgExpandAllBtn" type="button" data-i18n="orgExpandAll">Expand All</button>
+          <button id="orgCollapseAllBtn" type="button" data-i18n="orgCollapseAll">Collapse All</button>
+        </div>
+      </div>
+      <div id="orgChart" class="orgChart"></div>
+    </section>
+  </main>
+
+  <div class="modalBackdrop" id="orgModal" hidden>
+    <div class="modal orgModal">
+      <div class="modalHeader">
+        <div>
+          <h2 data-i18n="orgTitle">Organization</h2>
+          <p data-i18n="orgHint">Use indentation to define child departments.</p>
+        </div>
+        <button id="orgCancelTopBtn" type="button" title="Close">x</button>
+      </div>
+      <div class="orgEditorGrid">
+        <div class="orgStructurePane">
+          <div class="orgPaneHeader">
+            <h3 data-i18n="orgPreviewTitle">Current Structure</h3>
+            <span data-i18n="orgSelectNodeHint">Select a node to edit</span>
+          </div>
+          <div id="orgSummary" class="orgSummary"></div>
+          <div id="orgTree" class="orgTree"></div>
+        </div>
+        <div class="orgNodeEditor">
+          <div class="orgToolbar">
+            <button id="orgImportBtn" type="button" data-i18n="orgImport">Import</button>
+            <button id="orgExportBtn" type="button" data-i18n="orgExport">Export</button>
+            <input id="orgImportFile" type="file" accept=".json,application/json" hidden>
+          </div>
+          <div class="orgEditorSection">
+            <div class="orgPaneHeader">
+              <h3 data-i18n="orgNodeInfoTitle">Node Info</h3>
+              <span data-i18n="orgNodeInfoHint">Name and parent are applied before saving</span>
+            </div>
+          <div class="formGrid">
+            <label><span data-i18n="orgType">Type</span><select id="orgType">
+              <option value="company" data-i18n="orgTypeCompany">Company</option>
+              <option value="business-unit" data-i18n="orgTypeBusinessUnit">Business Unit</option>
+              <option value="division" data-i18n="orgTypeDivision">Division</option>
+              <option value="department" data-i18n="orgTypeDepartment">Department</option>
+              <option value="team" data-i18n="orgTypeTeam">Team</option>
+            </select></label>
+            <label><span data-i18n="orgCode">Code</span><input id="orgCode"></label>
+            <label><span data-i18n="orgName">Name</span><input id="orgName"></label>
+            <label><span data-i18n="orgManager">Manager</span><input id="orgManager"></label>
+            <label><span data-i18n="orgParent">Parent</span><select id="orgParent"></select></label>
+          </div>
+          <div class="orgEditActions">
+            <button id="orgApplyNodeBtn" class="primary" type="button" data-i18n="orgApplyNode">Apply Node</button>
+            <button id="orgAddChildBtn" type="button" data-i18n="orgAddChild">Add Child</button>
+            <button id="orgAddSiblingBtn" type="button" data-i18n="orgAddSibling">Add Sibling</button>
+            <button id="orgDeleteNodeBtn" class="danger" type="button" data-i18n="orgDeleteNode">Delete Node</button>
+          </div>
+          </div>
+          <div class="orgQuickActions">
+            <button id="orgAddCompanyBtn" type="button" data-i18n="orgAddCompany">Add Company</button>
+            <button id="orgAddDepartmentBtn" type="button" data-i18n="orgAddDepartment">Add Department</button>
+            <button id="orgAddTeamBtn" type="button" data-i18n="orgAddTeam">Add Team</button>
+          </div>
+          <div class="orgEmployeeEditor">
+            <div class="sectionTitle">
+              <h3 data-i18n="orgEmployees">Employees</h3>
+              <span id="orgEmployeeCount"></span>
+            </div>
+            <div id="orgEmployeeList" class="orgEmployeeList"></div>
+            <div class="formGrid">
+              <label><span data-i18n="orgEmployeeName">Name</span><input id="orgEmployeeName"></label>
+              <label><span data-i18n="orgEmployeeId">Employee ID</span><input id="orgEmployeeId"></label>
+              <label><span data-i18n="orgEmployeeTitle">Title</span><input id="orgEmployeeTitle"></label>
+              <label><span data-i18n="orgEmployeePhone">Phone</span><input id="orgEmployeePhone"></label>
+              <label><span data-i18n="orgEmployeeParent">Department / Parent</span><select id="orgEmployeeParent"></select></label>
+            </div>
+            <div class="orgEditActions">
+              <button id="orgAddEmployeeBtn" type="button" data-i18n="orgAddEmployee">Add Employee</button>
+              <button id="orgUpdateEmployeeBtn" class="primary" type="button" data-i18n="orgUpdateEmployee">Update Employee</button>
+              <button id="orgDeleteEmployeeBtn" class="danger" type="button" data-i18n="orgDeleteEmployee">Delete Employee</button>
+            </div>
+          </div>
+          <details class="orgAdvanced">
+            <summary data-i18n="orgAdvanced">Batch Text Edit</summary>
+            <label class="orgTextEditor">
+              <span data-i18n="orgEditTitle">Edit Structure</span>
+              <textarea id="orgText" rows="9" data-i18n-placeholder="orgTextPlaceholder" placeholder="Head Office&#10;  R&D&#10;  Production"></textarea>
+            </label>
+            <button id="orgApplyTextBtn" type="button" data-i18n="orgApplyText">Apply Text</button>
+          </details>
+        </div>
+      </div>
+      <div class="formActions modalActions">
+        <button id="orgCancelBtn" type="button" data-i18n="cancel">Cancel</button>
+        <button id="orgSaveBtn" class="primary" type="button" data-i18n="save">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/detail-pages.js"></script>
+</body>
+</html>

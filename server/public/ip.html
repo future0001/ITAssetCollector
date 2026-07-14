@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>IP Details</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body class="detailPage" data-page="ip">
+  <header class="detailTopbar">
+    <div class="brandBlock">
+      <div class="brandMark">IP</div>
+      <div class="brandText">
+        <h1 data-i18n="ipDetails">IP Details</h1>
+        <p id="detailSummary">Loading...</p>
+      </div>
+    </div>
+    <div class="detailActions">
+      <select id="languageSelect" title="Language">
+        <option value="zh-CN">&#x7B80;&#x4F53;&#x4E2D;&#x6587;</option>
+        <option value="en-US">English</option>
+      </select>
+      <button id="refreshBtn" type="button" data-i18n="refresh">Refresh</button>
+      <a class="button" href="/" data-i18n="backToAssets">Back</a>
+    </div>
+  </header>
+
+  <main class="detailLayout">
+    <section class="ipDashboard detailPanel" aria-label="IP resource usage">
+      <div class="ipDashboardHeader">
+        <div>
+          <h2 data-i18n="ipOverviewTitle">IP Overview</h2>
+          <p data-i18n="ipOverviewHint">Review conflicts and missing addresses, then select IP cells for reachability testing.</p>
+        </div>
+        <div class="ipLegend" aria-label="IP legend">
+          <span><i class="ipLegendDot used"></i><b data-i18n="ipLegendUsed">Used</b></span>
+          <span><i class="ipLegendDot duplicate"></i><b data-i18n="ipLegendDuplicate">Conflict</b></span>
+          <span><i class="ipLegendDot selected"></i><b data-i18n="ipLegendSelected">Selected</b></span>
+          <span><i class="ipLegendDot online"></i><b data-i18n="ipStatusOnline">Online</b></span>
+          <span><i class="ipLegendDot offline"></i><b data-i18n="ipStatusOffline">Offline</b></span>
+        </div>
+      </div>
+      <div id="ipMetricGrid" class="metricGrid"></div>
+      <div id="ipAlertList" class="ipAlertList"></div>
+      <div class="ipReachabilityPanel">
+        <div class="sectionTitle">
+          <h2 data-i18n="ipReachabilityTitle">Reachability Test</h2>
+          <span id="ipReachabilitySummary"></span>
+        </div>
+        <div class="ipReachabilityControls">
+          <label class="ipReachabilityInput">
+            <span data-i18n="ipReachabilityInput">IP addresses</span>
+            <textarea id="ipReachabilityInput" rows="3" data-i18n-placeholder="ipReachabilityPlaceholder" placeholder="192.168.1.10&#10;192.168.1.11"></textarea>
+          </label>
+          <div class="ipReachabilityActions">
+            <button id="ipTestSelectedBtn" class="primary" type="button" data-i18n="ipTestSelected">Test Selected</button>
+            <button id="ipTestAllBtn" type="button" data-i18n="ipTestAll">Test All Recorded IPs</button>
+            <button id="ipClearSelectionBtn" type="button" data-i18n="ipClearSelection">Clear Selection</button>
+          </div>
+        </div>
+        <div id="ipReachabilityResults" class="ipReachabilityResults"></div>
+      </div>
+      <div id="subnetUsageList" class="subnetUsageList"></div>
+    </section>
+  </main>
+
+  <script src="/detail-pages.js"></script>
+</body>
+</html>

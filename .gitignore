@@ -1,0 +1,34 @@
+# Runtime data and local secrets
+server/data/*.json
+!server/data/.gitignore
+server/data/backups/
+server/密钥设置.txt
+
+# Logs
+*.log
+*.err.log
+server/*.log
+
+# Build outputs and packaged binaries
+dist/
+server.zip
+server/client-updates/
+client/**/bin/
+*.exe
+*.dll
+*.pdb
+*.zip
+
+# Local/editor/system files
+.agents/
+.codex/
+.DS_Store
+Thumbs.db
+*.tmp
+
+# Ad-hoc inspection/generated helper outputs
+org_import_summary.json
+org_source_preview.json
+inspect_org_codepoints.py
+inspect_org_source.py
+build_org_import.py

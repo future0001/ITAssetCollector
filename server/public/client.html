@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Client Management</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body class="detailPage clientPage">
+  <header class="detailTopbar">
+    <div class="brandBlock">
+      <div class="brandMark">CLI</div>
+      <div class="brandText">
+        <h1 data-i18n="clientManagement">客户端管理</h1>
+        <p id="clientSummary">加载中...</p>
+      </div>
+    </div>
+    <div class="detailActions">
+      <select id="languageSelect" title="Language">
+        <option value="zh-CN">&#x7B80;&#x4F53;&#x4E2D;&#x6587;</option>
+        <option value="en-US">English</option>
+      </select>
+      <button id="refreshBtn" type="button" data-i18n="refresh">刷新</button>
+      <a class="button" href="/" data-i18n="backToAssets">返回资产</a>
+    </div>
+  </header>
+
+  <main class="detailLayout clientLayout">
+    <section class="detailPanel clientOverviewPanel">
+      <div class="clientDashboardHeader">
+        <div>
+          <h2 data-i18n="clientOverviewTitle">客户端概览</h2>
+          <p data-i18n="clientOverviewHint">优先关注未检测客户端、未建档心跳、待审核差异和升级包状态。</p>
+        </div>
+        <div class="clientLegend" aria-label="Client status legend">
+          <span><i class="clientLegendDot online"></i><b data-i18n="onlineNow">在线</b></span>
+          <span><i class="clientLegendDot offline"></i><b data-i18n="offlineNow">离线</b></span>
+          <span><i class="clientLegendDot missing"></i><b data-i18n="missingClients">未检测到客户端</b></span>
+          <span><i class="clientLegendDot extra"></i><b data-i18n="extraClients">有心跳但未建档</b></span>
+        </div>
+      </div>
+      <div class="panelHeader">
+        <div>
+          <h2 data-i18n="clientInstallTitle">安装状态</h2>
+          <p data-i18n="clientInstallHint">查看客户端安装、在线和未建档心跳情况。</p>
+        </div>
+        <button id="checkClientsBtn" type="button" data-i18n="refresh">刷新</button>
+      </div>
+      <div id="clientMetricGrid" class="metricGrid"></div>
+      <div id="clientStatusList" class="clientStatusList"></div>
+    </section>
+
+    <section class="detailPanel clientOpsPanel">
+      <div class="clientOpsGrid">
+        <div class="clientOpsBlock">
+          <h2 data-i18n="clientCollectTitle">采集任务</h2>
+          <p data-i18n="clientCollectHint">向已安装客户端下发采集任务，或对指定电脑发起差异复核采集。</p>
+          <div class="clientActionRow">
+            <button id="collectAgentsBtn" class="primary" type="button" data-i18n="collectAgents">一键收集客户端</button>
+            <button id="refreshDiffsBtn" type="button" data-i18n="reviewDiffs">查看采集差异</button>
+          </div>
+          <label class="clientTargetInput">
+            <span data-i18n="reviewTargets">复核电脑名</span>
+            <textarea id="reviewTargetsInput" rows="3" data-i18n-placeholder="reviewTargetsPlaceholder" placeholder="每行一个计算机名"></textarea>
+          </label>
+          <button id="reviewTargetsBtn" type="button" data-i18n="reviewCollectTargets">复核采集指定电脑</button>
+        </div>
+
+        <div class="clientOpsBlock clientDangerKeyBlock">
+          <h2 data-i18n="manageClientKey">客户端危险操作密钥</h2>
+          <p data-i18n="clientKeyHint">用于客户端修改使用人、卸载等敏感操作。</p>
+          <div class="clientKeyRow">
+            <input id="clientKeyInput" type="password" data-i18n-placeholder="clientKeyPlaceholder" placeholder="输入新密钥">
+            <button id="saveClientKeyBtn" type="button" data-i18n="save">保存</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="detailPanel clientDiffPanel">
+      <div class="panelHeader">
+        <div>
+          <h2 data-i18n="reviewDiffs">采集差异审核</h2>
+          <p data-i18n="reviewDiffHint">按电脑逐条查看变更，确认后应用到资产档案。</p>
+        </div>
+        <span id="diffSummary" class="mutedText">-</span>
+      </div>
+      <div id="diffList" class="diffList"></div>
+    </section>
+
+    <section class="detailPanel clientVersionPanel">
+      <div class="panelHeader">
+        <div>
+          <h2 data-i18n="versionManageTitle">客户端版本管理</h2>
+          <p data-i18n="versionManageHint">发布标准版和 XP 版客户端自动升级包。</p>
+        </div>
+        <button id="versionRefreshBtn" type="button" data-i18n="refresh">刷新</button>
+      </div>
+      <div id="versionStatusList" class="versionStatusList clientVersionStatus"></div>
+      <div class="versionUploadGrid">
+        <section class="versionUploadPanel">
+          <h3 data-i18n="versionWinTitle">标准客户端</h3>
+          <label><span data-i18n="versionNumber">版本号</span><input id="versionWinNumber" placeholder="1.1.0.0"></label>
+          <label><span data-i18n="versionExeFile">EXE 文件</span><input id="versionWinExe" type="file" accept=".exe,application/octet-stream"></label>
+          <label><span data-i18n="versionConfigFile">配置文件</span><input id="versionWinConfig" type="file" accept=".config,.xml,text/xml,application/xml"></label>
+          <label><span data-i18n="versionNotes">备注</span><textarea id="versionWinNotes" rows="2"></textarea></label>
+          <button id="publishWinVersionBtn" class="primary" type="button" data-i18n="publishVersion">发布</button>
+        </section>
+        <section class="versionUploadPanel">
+          <h3 data-i18n="versionXpTitle">XP 客户端</h3>
+          <label><span data-i18n="versionNumber">版本号</span><input id="versionXpNumber" placeholder="1.1.0.0"></label>
+          <label><span data-i18n="versionExeFile">EXE 文件</span><input id="versionXpExe" type="file" accept=".exe,application/octet-stream"></label>
+          <label><span data-i18n="versionConfigFile">配置文件</span><input id="versionXpConfig" type="file" accept=".config,.xml,text/xml,application/xml"></label>
+          <label><span data-i18n="versionNotes">备注</span><textarea id="versionXpNotes" rows="2"></textarea></label>
+          <button id="publishXpVersionBtn" class="primary" type="button" data-i18n="publishVersion">发布</button>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <script src="/client.js"></script>
+</body>
+</html>

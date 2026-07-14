@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>IT Asset Manager</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body class="assetPage">
+  <header class="topbar">
+    <div class="brandBlock">
+      <div class="brandMark">IT</div>
+      <div class="brandText">
+        <h1 data-i18n="appTitle">IT Asset Manager</h1>
+        <p id="totalText">Loading...</p>
+      </div>
+    </div>
+    <nav class="moduleNav" aria-label="Main modules">
+      <a class="active" href="/" data-i18n="navAssets">Assets</a>
+      <a href="/ip.html" data-i18n="ipDetails">IP Details</a>
+      <a href="/org.html" data-i18n="orgChartTitle">Organization Chart</a>
+      <a href="/client.html" data-i18n="clientManagement">Client Management</a>
+    </nav>
+    <div class="actions">
+      <div class="filterStrip">
+        <select id="languageSelect" title="Language">
+          <option value="zh-CN">&#x7B80;&#x4F53;&#x4E2D;&#x6587;</option>
+          <option value="en-US">English</option>
+        </select>
+        <select id="categoryFilter" data-i18n-title="categoryFilter">
+          <option value="" data-i18n="allCategories">All Categories</option>
+        </select>
+        <select id="orgFilter" data-i18n-title="orgFilter">
+          <option value="" data-i18n="allOrganizations">All Organizations</option>
+        </select>
+        <input id="searchInput" type="search" data-i18n-placeholder="searchPlaceholder" placeholder="Search">
+        <details class="filterMenu" id="missingFieldMenu">
+          <summary id="missingFieldSummary" data-i18n="missingFieldFilter">Missing Fields</summary>
+          <div class="filterMenuBody">
+            <div id="missingFieldFilters" class="missingFieldFilters"></div>
+            <button id="clearMissingFiltersBtn" type="button" data-i18n="clearMissingFilters">Clear</button>
+          </div>
+        </details>
+      </div>
+      <div class="commandStrip">
+        <button id="addAssetBtn" class="primary" type="button" data-i18n="addRecord">Add Record</button>
+        <button id="collectAgentsBtn" type="button" data-i18n="collectAgents">Collect Installed Clients</button>
+        <button id="refreshBtn" type="button" data-i18n="refresh">Refresh</button>
+        <details class="actionMenu">
+          <summary data-i18n="moreActions">More</summary>
+          <div class="actionMenuBody">
+            <div class="menuSection">
+              <div class="menuLabel" data-i18n="menuDataOps">Data</div>
+              <button id="exportSelectedBtn" type="button" data-i18n="exportSelected">Export Selected</button>
+              <a id="exportAllLink" class="button primary" href="/export.xls" data-i18n="exportAll">Export All</a>
+              <button id="importOfflineBtn" type="button" data-i18n="importOffline">Import Offline</button>
+            </div>
+            <div class="menuSection">
+              <div class="menuLabel" data-i18n="menuMaintainOps">Maintain</div>
+              <button id="reviewCollectBtn" type="button" data-i18n="reviewCollect">Review Re-collect Selected</button>
+              <button id="setCategoryBtn" type="button" data-i18n="setCategory">Set Category</button>
+              <button id="manageCategoryBtn" type="button" data-i18n="manageCategories">Manage Categories</button>
+              <button id="downloadBackupBtn" type="button" data-i18n="downloadBackup">Download Backup</button>
+              <button id="restoreBackupBtn" type="button" data-i18n="restoreBackup">Restore Backup</button>
+              <button id="cleanupAbnormalBtn" type="button" data-i18n="cleanupAbnormal">Clean Abnormal Devices</button>
+            </div>
+            <div class="menuSection dangerSection">
+              <div class="menuLabel" data-i18n="menuDangerOps">Danger</div>
+              <button id="deleteSelectedBtn" class="danger" type="button" data-i18n="deleteSelected">Delete Selected</button>
+            </div>
+          </div>
+        </details>
+      </div>
+      <input id="importOfflineFile" type="file" accept=".json,.xls,.html,application/json,application/vnd.ms-excel,text/html" hidden>
+      <input id="restoreBackupFile" type="file" accept=".json,application/json" hidden>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="assetVisualPanel" aria-label="Asset overview">
+      <div class="assetVisualHeader">
+        <div>
+          <h2 data-i18n="assetOverviewTitle">Asset Overview</h2>
+          <p id="assetOverviewHint" data-i18n="assetOverviewHint">Visual summary follows current filters and search results.</p>
+        </div>
+        <div class="assetVisualActions">
+          <button id="clearAssetVisualFilterBtn" class="assetVisualClear" type="button" hidden data-i18n="clearVisualFilter">Clear drilldown</button>
+          <div id="assetHealthScore" class="assetHealthScore"></div>
+        </div>
+      </div>
+      <div id="assetMetricGrid" class="assetMetricGrid"></div>
+      <div class="assetVisualGrid">
+        <div class="assetVisualCard">
+          <div class="assetVisualCardHeader">
+            <h3 data-i18n="assetCategoryDistribution">Category Distribution</h3>
+            <span id="assetCategoryCount"></span>
+          </div>
+          <div id="assetCategoryBars" class="assetBars"></div>
+        </div>
+        <div class="assetVisualCard">
+          <div class="assetVisualCardHeader">
+            <h3 data-i18n="assetDepartmentTop">Department Top</h3>
+            <span id="assetDepartmentCount"></span>
+          </div>
+          <div id="assetDepartmentBars" class="assetBars"></div>
+        </div>
+        <div class="assetVisualCard assetIssueCard">
+          <div class="assetVisualCardHeader">
+            <h3 data-i18n="assetIssueOverview">Issue Overview</h3>
+            <span id="assetIssueCount"></span>
+          </div>
+          <div id="assetIssueList" class="assetIssueList"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="tablePanel">
+      <table>
+        <thead>
+          <tr>
+            <th class="colSelect"><input id="selectAll" type="checkbox" title="Select all"></th>
+            <th class="colCategory" data-i18n="category">Category</th>
+            <th class="colUser" data-i18n="user">User</th>
+            <th class="colComputer" data-i18n="computer">Computer</th>
+            <th class="colNetwork" data-i18n="nics">NICs</th>
+            <th class="colDisk" data-i18n="disks">Disks</th>
+            <th class="colBoard" data-i18n="mainboard">Mainboard</th>
+            <th class="colTime" data-i18n="time">Time</th>
+            <th class="colAction" data-i18n="action">Action</th>
+          </tr>
+        </thead>
+        <tbody id="assetRows"></tbody>
+      </table>
+      <div id="emptyState" class="empty" data-i18n="noRecords">No records</div>
+    </section>
+
+    <aside class="editor" id="editor" hidden>
+      <div class="editorHeader">
+        <div>
+          <h2 data-i18n="editRecord">Edit Record</h2>
+          <p id="editorHint">Select a record to edit</p>
+        </div>
+        <button id="closeEditorBtn" type="button" title="Clear">x</button>
+      </div>
+      <form id="assetForm">
+        <input type="hidden" id="assetId">
+
+        <div class="formGrid">
+          <label><span data-i18n="category">Category</span><input id="category" list="categoryOptions"></label>
+        </div>
+        <details class="optionalMeta">
+          <summary data-i18n="optionalTags">Optional tags</summary>
+          <label><span data-i18n="tags">Tags</span><input id="tags" data-i18n-placeholder="tagsPlaceholder" placeholder="server, production"></label>
+        </details>
+        <datalist id="categoryOptions">
+          <option value="server">
+          <option value="desktop">
+          <option value="laptop">
+          <option value="virtual-machine">
+          <option value="spare">
+        </datalist>
+
+        <div class="formGrid">
+          <label><span data-i18n="name">Name</span><input id="userName"></label>
+          <label><span data-i18n="department">Department</span><input id="department" list="departmentOptions"></label>
+          <label><span data-i18n="employeeId">Employee ID</span><input id="employeeId"></label>
+          <label><span data-i18n="location">Location</span><input id="location" list="locationOptions"></label>
+          <label><span data-i18n="phone">Phone</span><input id="phone"></label>
+          <label><span data-i18n="assetCode">Asset Code</span><input id="computerCode"></label>
+          <label><span data-i18n="computerName">Computer Name</span><input id="computerName"></label>
+        </div>
+        <datalist id="departmentOptions">
+          <option value="&#x7814;&#x53D1;&#x90E8;">
+          <option value="&#x54C1;&#x7BA1;&#x90E8;">
+          <option value="&#x751F;&#x4EA7;&#x90E8;">
+          <option value="&#x91C7;&#x8D2D;&#x90E8;">
+          <option value="&#x8D22;&#x52A1;&#x90E8;">
+          <option value="&#x4EBA;&#x4E8B;&#x90E8;">
+          <option value="&#x4EA7;&#x54C1;&#x90E8;">
+          <option value="&#x5916;&#x8D38;&#x90E8;">
+          <option value="&#x5546;&#x52A1;&#x90E8;">
+          <option value="&#x9500;&#x552E;&#x90E8;">
+        </datalist>
+        <datalist id="locationOptions">
+          <option value="10&#x697C;&#x7814;&#x53D1;&#x90E8;">
+          <option value="9&#x697C;&#x54C1;&#x7BA1;&#x90E8;">
+          <option value="9&#x697C;&#x751F;&#x4EA7;&#x90E8;">
+          <option value="10&#x697C;&#x91C7;&#x8D2D;&#x90E8;">
+          <option value="17&#x697C;&#x8D22;&#x52A1;&#x90E8;">
+          <option value="17&#x697C;&#x4EBA;&#x4E8B;&#x90E8;">
+          <option value="17&#x697C;&#x4EA7;&#x54C1;&#x90E8;">
+          <option value="17&#x697C;&#x5916;&#x8D38;&#x90E8;">
+          <option value="17&#x697C;&#x5546;&#x52A1;&#x90E8;">
+          <option value="17&#x697C;&#x9500;&#x552E;&#x90E8;">
+          <option value="8&#x697C;&#x5B9E;&#x9A8C;&#x5BA4;">
+          <option value="8&#x697C;&#x4ED3;&#x5E93;">
+          <option value="10&#x697C;&#x673A;&#x623F;">
+          <option value="17&#x697C;&#x673A;&#x623F;">
+        </datalist>
+
+        <label><span data-i18n="note">Note</span><textarea id="note" rows="3"></textarea></label>
+
+        <div class="formGrid">
+          <label><span data-i18n="os">OS</span><input id="osCaption"></label>
+          <label><span data-i18n="installTime">Install Time</span><input id="installDate"></label>
+          <label><span data-i18n="boardMaker">Board Maker</span><input id="boardManufacturer"></label>
+          <label><span data-i18n="boardModel">Board Model</span><input id="boardProduct"></label>
+          <input id="boardSerial" type="hidden">
+        </div>
+
+        <label><span data-i18n="nics">NICs</span><textarea id="nics" rows="5" data-i18n-placeholder="nicsPlaceholder" placeholder="One per line: name | mac | ipv4,ipv4"></textarea></label>
+        <div id="ipConflictHint" class="ipConflictHint" hidden></div>
+        <label><span data-i18n="disks">Disks</span><textarea id="disks" rows="6" data-i18n-placeholder="disksPlaceholder" placeholder="One per line: model | serial | size"></textarea></label>
+
+        <div class="formActions">
+          <button class="primary" type="submit" data-i18n="save">Save</button>
+          <button id="deleteBtn" class="danger" type="button" data-i18n="delete">Delete</button>
+        </div>
+      </form>
+    </aside>
+  </main>
+
+  <div class="modalBackdrop" id="cleanupModal" hidden>
+    <div class="modal">
+      <div class="modalHeader">
+        <div>
+          <h2 data-i18n="cleanupSourceTitle">Select abnormal data sources</h2>
+          <p data-i18n="cleanupSourceHint">Only selected sources will be removed.</p>
+        </div>
+        <button id="cleanupCancelTopBtn" type="button" title="Close">x</button>
+      </div>
+      <div id="cleanupSourceList" class="sourceList"></div>
+      <div class="formActions modalActions">
+        <button id="cleanupCancelBtn" type="button" data-i18n="cancel">Cancel</button>
+        <button id="cleanupRunBtn" class="danger" type="button" data-i18n="cleanupRun">Clean Selected</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modalBackdrop" id="categoryModal" hidden>
+    <div class="modal categoryModal">
+      <div class="modalHeader">
+        <div>
+          <h2 data-i18n="categoryManageTitle">Category Presets</h2>
+          <p data-i18n="categoryManageHint">Maintain category names used by filters and batch category setting.</p>
+        </div>
+        <button id="categoryCancelTopBtn" type="button" title="Close">x</button>
+      </div>
+      <div class="categoryEditorBody">
+        <label class="categoryAddRow">
+          <span data-i18n="categoryPresetAdd">Add category</span>
+          <div class="categoryAddControls">
+            <input id="categoryPresetInput" data-i18n-placeholder="categoryPresetPlaceholder" placeholder="Category name">
+            <button id="categoryAddBtn" type="button" data-i18n="categoryPresetAddBtn">Add</button>
+          </div>
+        </label>
+        <div class="categoryPresetPanel">
+          <div class="categoryPresetHeader">
+            <strong data-i18n="categoryPresetList">Preset categories</strong>
+            <span id="categoryPresetCount">0</span>
+          </div>
+          <div id="categoryPresetList" class="categoryPresetList"></div>
+        </div>
+      </div>
+      <div class="formActions modalActions">
+        <button id="categoryCancelBtn" type="button" data-i18n="cancel">Cancel</button>
+        <button id="categorySaveBtn" class="primary" type="button" data-i18n="save">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modalBackdrop" id="categorySelectModal" hidden>
+    <div class="modal categoryModal">
+      <div class="modalHeader">
+        <div>
+          <h2 data-i18n="categorySelectTitle">Choose category</h2>
+          <p id="categorySelectHint">Select records first.</p>
+        </div>
+        <button id="categorySelectCancelTopBtn" type="button" title="Close">x</button>
+      </div>
+      <div class="categoryEditorBody">
+        <div id="categoryQuickList" class="categoryQuickList"></div>
+        <label class="categoryAddRow">
+          <span data-i18n="categoryCustomLabel">New or custom category</span>
+          <input id="categoryCustomInput" list="categoryOptions" data-i18n-placeholder="categoryPresetPlaceholder" placeholder="Category name">
+        </label>
+      </div>
+      <div class="formActions modalActions">
+        <button id="categoryClearBtn" type="button" data-i18n="clearCategory">Clear category</button>
+        <button id="categorySelectCancelBtn" type="button" data-i18n="cancel">Cancel</button>
+        <button id="categoryApplyBtn" class="primary" type="button" data-i18n="applyCategory">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>
