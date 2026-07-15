@@ -48,12 +48,12 @@ namespace AssetCollector
                     return false;
                 }
 
-                message = "无法连接服务端验证密钥，离线环境请使用兜底密钥。";
+                message = "无法连接服务端验证密钥。请连接服务端后重试；卸载客户端可使用本机管理员确认。";
                 return false;
             }
             catch
             {
-                message = "无法连接服务端验证密钥，离线环境请使用兜底密钥。";
+                message = "无法连接服务端验证密钥。请连接服务端后重试；卸载客户端可使用本机管理员确认。";
                 return false;
             }
         }
@@ -84,6 +84,5 @@ namespace AssetCollector
         {
             return (value ?? string.Empty).Replace("\\", "\\\\").Replace("\"", "\\\"");
         }
-
     }
 }

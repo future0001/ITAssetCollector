@@ -49,6 +49,11 @@ namespace AssetCollector
                     RunElevatedInstallCommand(args);
                     return;
                 }
+                if (command == "/uninstall-service" || command == "-uninstall-service")
+                {
+                    RunElevatedUninstallCommand();
+                    return;
+                }
                 if (command == "/apply-update" || command == "-apply-update")
                 {
                     ApplyUpdateCommand(args);
@@ -58,11 +63,7 @@ namespace AssetCollector
                 {
                     Application.EnableVisualStyles();
                     Application.SetCompatibleTextRenderingDefault(false);
-                    if (!SecurityClient.PromptAndVerify(null, AgentSettings.Load().serverUrl, "Uninstall Client"))
-                    {
-                        return;
-                    }
-                    UninstallService();
+                    RequestUninstallClient(null);
                     return;
                 }
             }
@@ -169,6 +170,16 @@ namespace AssetCollector
             Process.Start(psi);
         }
 
+        public static void RestartElevatedUninstall()
+        {
+            var psi = new ProcessStartInfo();
+            psi.FileName = Application.ExecutablePath;
+            psi.Arguments = "/uninstall-service";
+            psi.UseShellExecute = true;
+            psi.Verb = "runas";
+            Process.Start(psi);
+        }
+
         private static void RunElevatedInstallCommand(string[] args)
         {
             Application.EnableVisualStyles();
@@ -186,6 +197,22 @@ namespace AssetCollector
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, "安装失败", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private static void RunElevatedUninstallCommand()
+        {
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+
+            try
+            {
+                UninstallService();
+                MessageBox.Show("客户端后台服务和托盘自启动已卸载。", "卸载完成", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "卸载失败", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -430,6 +457,26 @@ namespace AssetCollector
         {
             RemoveExistingService();
             DisableTrayStartup();
+        }
+
+        public static bool RequestUninstallClient(IWin32Window owner)
+        {
+            DialogResult result = MessageBox.Show(owner,
+                "此操作会停止并删除客户端后台服务，并取消托盘自启动。\r\n\r\n服务端离线时也可以卸载，但需要本机管理员权限。是否继续？",
+                "卸载客户端",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Warning);
+            if (result != DialogResult.Yes) return false;
+
+            if (!IsAdministrator())
+            {
+                RestartElevatedUninstall();
+                return true;
+            }
+
+            UninstallService();
+            MessageBox.Show(owner, "客户端后台服务和托盘自启动已卸载。", "卸载完成", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            return true;
         }
 
         public static bool VerifySensitiveOperation(IWin32Window owner, string title)

@@ -150,7 +150,7 @@ namespace AssetCollector
                 new MenuItem("重启服务", delegate { RestartService(); }),
                 new MenuItem("-"),
                 new MenuItem("安装服务", delegate { Program.InstallService(); RefreshTrayStatus(); }),
-                new MenuItem("卸载服务", delegate { if (Program.VerifySensitiveOperation(this, "卸载服务")) { Program.UninstallService(); RefreshTrayStatus(); } })
+                new MenuItem("卸载服务", delegate { if (Program.RequestUninstallClient(this)) RefreshTrayStatus(); })
             });
 
             trayIcon = new NotifyIcon
