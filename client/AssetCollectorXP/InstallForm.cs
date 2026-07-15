@@ -228,11 +228,11 @@ namespace AssetCollector
                 RunOnUi(delegate
                 {
                     serverUrlBox.Text = url;
-                    ToggleBusy(false, "\u670d\u52a1\u5668\u5730\u5740\uff1a" + url + (string.Equals(url, DiscoveryClient.FallbackServerUrl, StringComparison.OrdinalIgnoreCase) ? " \uff08\u515c\u5e95\uff09" : string.Empty));
+                    ToggleBusy(false, "\u670d\u52a1\u5668\u5730\u5740\uff1a" + url + (string.Equals(url, DiscoveryClient.FallbackServerUrl, StringComparison.OrdinalIgnoreCase) ? " \uff08\u9ed8\u8ba4\uff09" : string.Empty));
                     BeginLoadOrganizationDepartments();
                     if (showResult)
                     {
-                        string message = error == null ? "\u5df2\u8bbe\u7f6e\u670d\u52a1\u5668\u5730\u5740\uff1a\r\n" + url : error.Message + "\r\n\r\n\u5df2\u4f7f\u7528\u515c\u5e95\u5730\u5740\uff1a\r\n" + url;
+                        string message = error == null ? "\u5df2\u8bbe\u7f6e\u670d\u52a1\u5668\u5730\u5740\uff1a\r\n" + url : error.Message + "\r\n\r\n\u5df2\u4f7f\u7528\u9ed8\u8ba4\u5730\u5740\uff1a\r\n" + url;
                         MessageBox.Show(this, message, "\u81ea\u52a8\u63a2\u6d4b", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                 });
@@ -331,7 +331,7 @@ namespace AssetCollector
                 }
 
                 Program.InstallClient(serverUrl, userName, department);
-                MessageBox.Show(this, "\u5ba2\u6237\u7aef\u5b89\u88c5\u5b8c\u6210\uff0c\u540e\u53f0\u670d\u52a1\u548c\u6258\u76d8\u5df2\u542f\u52a8\u3002\r\n\r\n\u5b89\u88c5\u76ee\u5f55\uff1a" + Program.InstallDirectory(), "\u5b89\u88c5\u5b8c\u6210", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show(this, "\u5ba2\u6237\u7aef\u5b89\u88c5\u5b8c\u6210\uff0c\u540e\u53f0\u670d\u52a1\u3001\u6258\u76d8\u548c\u4e3b\u754c\u9762\u5df2\u542f\u52a8\u3002\r\n\r\n\u5b89\u88c5\u76ee\u5f55\uff1a" + Program.InstallDirectory(), "\u5b89\u88c5\u5b8c\u6210", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 Close();
             }
             catch (Exception ex)

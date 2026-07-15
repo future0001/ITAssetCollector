@@ -192,7 +192,7 @@ namespace AssetCollector
                 string department = args.Length > 3 ? args[3] : string.Empty;
 
                 InstallClient(serverUrl, userName, department);
-                MessageBox.Show("Client installed. Background service and tray have started.", "Install complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("客户端安装完成，后台服务、托盘和主界面已启动。", "安装完成", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
@@ -321,6 +321,7 @@ namespace AssetCollector
             AgentSettings.SaveInstallSettings(installedExe, serverUrl, userName, department);
             InstallService(installedExe);
             CreateDesktopShortcut(installedExe);
+            StartClientUiProcess(installedExe);
         }
 
         public static string CurrentVersion()
@@ -457,6 +458,7 @@ namespace AssetCollector
         {
             RemoveExistingService();
             DisableTrayStartup();
+            StopInstalledTrayProcesses();
         }
 
         public static bool RequestUninstallClient(IWin32Window owner)
@@ -593,6 +595,20 @@ namespace AssetCollector
             psi.Arguments = "/tray";
             psi.UseShellExecute = true;
             Process.Start(psi);
+        }
+
+        private static void StartClientUiProcess(string exe)
+        {
+            try
+            {
+                var psi = new ProcessStartInfo();
+                psi.FileName = exe;
+                psi.UseShellExecute = true;
+                Process.Start(psi);
+            }
+            catch
+            {
+            }
         }
 
         private static void CreateDesktopShortcut(string exe)
