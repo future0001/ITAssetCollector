@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Net;
+using System.Security.Cryptography;
 using System.Text;
 using System.Windows.Forms;
 
@@ -8,6 +9,8 @@ namespace AssetCollector
 {
     public static class SecurityClient
     {
+        private const string OfflineFallbackKeySha256 = "302ce0f50d3a86806d2f02b374db8b18855d0ef3a11ff94cf4fa133e1aac4553";
+
         public static bool VerifyKey(string serverUrl, string key, out string message)
         {
             key = (key ?? string.Empty).Trim();
@@ -48,13 +51,11 @@ namespace AssetCollector
                     return false;
                 }
 
-                message = "无法连接服务端验证密钥。请连接服务端后重试；卸载客户端可使用本机管理员确认。";
-                return false;
+                return VerifyOfflineFallbackKey(key, out message);
             }
             catch
             {
-                message = "无法连接服务端验证密钥。请连接服务端后重试；卸载客户端可使用本机管理员确认。";
-                return false;
+                return VerifyOfflineFallbackKey(key, out message);
             }
         }
 
@@ -72,6 +73,18 @@ namespace AssetCollector
             }
         }
 
+        private static bool VerifyOfflineFallbackKey(string key, out string message)
+        {
+            if (string.Equals(Sha256Hex(key), OfflineFallbackKeySha256, StringComparison.OrdinalIgnoreCase))
+            {
+                message = string.Empty;
+                return true;
+            }
+
+            message = "无法连接服务端验证密钥。离线环境请输入兜底密钥。";
+            return false;
+        }
+
         private static string NormalizeUrl(string value)
         {
             string url = (value ?? string.Empty).Trim().TrimEnd('/');
@@ -83,6 +96,20 @@ namespace AssetCollector
         private static string EscapeJson(string value)
         {
             return (value ?? string.Empty).Replace("\\", "\\\\").Replace("\"", "\\\"");
+        }
+
+        private static string Sha256Hex(string value)
+        {
+            using (SHA256 sha = SHA256.Create())
+            {
+                byte[] hash = sha.ComputeHash(Encoding.UTF8.GetBytes(value ?? string.Empty));
+                StringBuilder text = new StringBuilder(hash.Length * 2);
+                foreach (byte item in hash)
+                {
+                    text.Append(item.ToString("x2"));
+                }
+                return text.ToString();
+            }
         }
     }
 }
